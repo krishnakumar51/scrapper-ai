@@ -149,6 +149,7 @@ const FloatingInput = ({ onSendMessage, disabled = false, centered = false }: Fl
               <Textarea
                 ref={textareaRef}
                 value={message}
+                
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onCompositionStart={() => setIsComposing(true)}
