@@ -22,10 +22,10 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
   };
 
   return (
-    <div className={`flex gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-3 group transition-all duration-200 hover:bg-scraper-bg-card/20 ${
+    <div className={`flex gap-3 sm:gap-4 px-4 sm:px-6 py-4 sm:py-5 group transition-all duration-200 hover:bg-scraper-bg-card/10 rounded-xl ${
       isUser 
         ? 'bg-transparent justify-end' 
-        : 'bg-scraper-bg-card/10 justify-start border-l-2 border-scraper-accent-primary/20'
+        : 'bg-transparent justify-start'
     }`}>
       {isUser ? (
         // User message layout (right-aligned)
@@ -47,10 +47,10 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
             </div>
 
             {/* Message Content */}
-            <div className="bg-scraper-gradient-primary rounded-2xl rounded-tr-md px-3 sm:px-4 py-2 sm:py-3 shadow-lg border border-scraper-border/20">
-              <div className="text-scraper-text-primary leading-relaxed text-sm sm:text-[15px]">
+            <div className="bg-scraper-gradient-primary rounded-2xl rounded-tr-md px-4 sm:px-5 py-3 sm:py-4 shadow-lg border border-scraper-border/20">
+              <div className="text-scraper-text-primary leading-relaxed text-base sm:text-[16px]">
                 {message.content.split('\n').map((line, index) => (
-                  <p key={index} className="mb-1 sm:mb-2 last:mb-0 font-medium">
+                  <p key={index} className="mb-2 sm:mb-3 last:mb-0 font-medium">
                     {line}
                   </p>
                 ))}
@@ -59,16 +59,16 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
           </div>
 
           {/* Avatar */}
-          <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-scraper-gradient-primary shadow-lg ring-2 ring-scraper-accent-primary/20">
-            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-scraper-text-primary" />
+          <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-scraper-gradient-primary shadow-lg ring-2 ring-scraper-accent-primary/20">
+            <User className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-scraper-text-primary" />
           </div>
         </>
       ) : (
         // Assistant message layout (left-aligned)
         <>
           {/* Avatar */}
-          <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-scraper-bg-card border-2 border-scraper-accent-primary/30 shadow-md">
-            <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-scraper-accent-primary" />
+          <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center bg-scraper-bg-card border-2 border-scraper-accent-primary/30 shadow-md">
+            <Bot className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-scraper-accent-primary" />
           </div>
 
           {/* Content */}
@@ -96,9 +96,9 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
             </div>
 
             {/* Message Content */}
-            <div className="text-scraper-text-primary leading-relaxed text-sm sm:text-[15px] prose prose-invert max-w-none">
+            <div className="text-scraper-text-primary leading-relaxed text-base sm:text-[16px] prose prose-invert max-w-none">
               {message.content.split('\n').map((line, index) => (
-                <p key={index} className="mb-3 sm:mb-4 last:mb-0 font-normal">
+                <p key={index} className="mb-4 sm:mb-5 last:mb-0 font-normal">
                   {line}
                 </p>
               ))}

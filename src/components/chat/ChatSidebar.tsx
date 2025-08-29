@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { MessageSquare, Search, Trash2, Plus, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Settings, Brain } from 'lucide-react';
+import { MessageSquare, Search, Trash2, Plus, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Settings, Brain, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { Link, useLocation } from 'react-router-dom';
 import { useChatStorage } from '@/hooks/useChatStorage';
 import { ChatSession } from '@/types/chat';
@@ -52,14 +53,14 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
   };
 
   return (
-    <>
+    <TooltipProvider>
       {/* Main Navigation Bar */}
-      <div className="fixed left-0 top-0 bottom-0 w-16 bg-scraper-bg-secondary border-r border-scraper-border shadow-scraper-sm z-50">
+      <div className="fixed left-0 top-0 bottom-0 w-20 bg-scraper-bg-secondary border-r border-scraper-border shadow-scraper-sm z-50">
         {/* Brand Logo */}
         <div className="flex items-center justify-center p-4 border-b border-scraper-border h-16">
-          <Link to="/" className="hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 bg-scraper-gradient-primary rounded-xl flex items-center justify-center shadow-scraper-md hover:shadow-scraper-lg transition-all duration-200 hover:scale-105">
-              <Brain className="w-6 h-6 text-scraper-text-primary" />
+          <Link to="/" className="hover:opacity-80 transition-opacity" onClick={() => isChatPanelOpen && onChatToggle()}>
+            <div className="w-12 h-12 bg-scraper-gradient-primary rounded-xl flex items-center justify-center shadow-scraper-md hover:shadow-scraper-lg transition-all duration-200 hover:scale-105">
+              <Brain className="w-7 h-7 text-scraper-text-primary" />
             </div>
           </Link>
         </div>
@@ -67,72 +68,105 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
         {/* Navigation Icons */}
         <nav className="p-3 space-y-3">
           {/* Chat Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onChatToggle}
-            className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 hover:scale-105 ${
-              isChatPanelOpen
-                ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
-                : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
-            }`}
-            title="Chat History"
-          >
-            <MessageSquare className="w-5 h-5" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onChatToggle}
+                className={`w-12 h-12 p-0 rounded-xl transition-all duration-200 hover:scale-105 ${
+                  isChatPanelOpen
+                    ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
+                    : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
+                }`}
+              >
+                <MessageSquare className="w-6 h-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
+              <p>Chat History</p>
+            </TooltipContent>
+          </Tooltip>
 
           {/* Dashboard */}
-          <Link
-            to="/dashboard"
-            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 hover:scale-105 ${
-              isActive('/dashboard')
-                ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
-                : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
-            }`}
-            title="Dashboard"
-          >
-            <LayoutDashboard className="w-5 h-5" />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                to="/dashboard"
+                className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 hover:scale-105 ${
+                  isActive('/dashboard')
+                    ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
+                    : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
+                }`}
+                onClick={() => isChatPanelOpen && onChatToggle()}
+              >
+                <LayoutDashboard className="w-6 h-6" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
+              <p>Dashboard</p>
+            </TooltipContent>
+          </Tooltip>
 
           {/* Metrics */}
-          <Link
-            to="/metrics"
-            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 hover:scale-105 ${
-              isActive('/metrics')
-                ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
-                : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
-            }`}
-            title="Metrics"
-          >
-            <BarChart3 className="w-5 h-5" />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                to="/metrics"
+                className={`flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 hover:scale-105 ${
+                  isActive('/metrics')
+                    ? 'bg-scraper-accent-primary text-scraper-text-primary shadow-scraper-glow'
+                    : 'text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card'
+                }`}
+                onClick={() => isChatPanelOpen && onChatToggle()}
+              >
+                <BarChart3 className="w-6 h-6" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
+              <p>Metrics</p>
+            </TooltipContent>
+          </Tooltip>
 
           {/* Settings */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-10 h-10 p-0 rounded-xl text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card transition-all duration-200 hover:scale-105"
-            title="Settings"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-12 h-12 p-0 rounded-xl text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card transition-all duration-200 hover:scale-105"
+              >
+                <Settings className="w-6 h-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
+              <p>Settings</p>
+            </TooltipContent>
+          </Tooltip>
         </nav>
 
-        {/* New Chat Button */}
+        {/* User Profile */}
         <div className="absolute bottom-4 left-3 right-3">
-          <Button
-            onClick={handleNewChat}
-            className="w-10 h-10 p-0 bg-scraper-gradient-primary hover:opacity-90 text-scraper-text-primary shadow-scraper-md hover:shadow-scraper-lg transition-all duration-200 hover:scale-105 rounded-xl"
-            title="New Chat"
-          >
-            <Plus className="w-5 h-5" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-12 h-12 p-0 rounded-xl text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card transition-all duration-200 hover:scale-105"
+              >
+                <User className="w-6 h-6" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-scraper-bg-card border-scraper-border text-scraper-text-primary">
+              <p>User Profile</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
       {/* Chat History Panel */}
       <div
-        className={`fixed left-16 top-0 bottom-0 w-80 bg-scraper-bg-secondary border-r border-scraper-border shadow-scraper-lg z-40 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed left-20 top-0 bottom-0 w-80 bg-scraper-bg-secondary border-r border-scraper-border shadow-scraper-lg z-40 transform transition-transform duration-300 ease-in-out ${
           isChatPanelOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -149,14 +183,24 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onChatToggle}
-            className="h-8 w-8 text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card rounded-lg"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={handleNewChat}
+              size="sm"
+              className="h-10 w-10 p-0 bg-scraper-gradient-primary hover:opacity-90 text-scraper-text-primary shadow-scraper-sm hover:shadow-scraper-md transition-all duration-200 hover:scale-105 rounded-lg"
+              title="New Chat"
+            >
+              <Plus className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onChatToggle}
+              className="h-8 w-8 text-scraper-text-secondary hover:text-scraper-text-primary hover:bg-scraper-bg-card rounded-lg"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Search */}
@@ -222,7 +266,7 @@ const ChatSidebar = ({ isChatPanelOpen, onChatToggle }: ChatSidebarProps) => {
           </div>
         </ScrollArea>
       </div>
-    </>
+    </TooltipProvider>
   );
 };
 

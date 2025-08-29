@@ -26,9 +26,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-scraper-bg-primary">
-
-      
+    <div 
+      className="min-h-screen bg-scraper-bg-primary"
+      style={{
+         '--sidebar-width': isChatPanelOpen ? '400px' : '80px',
+         '--sources-width': sourcesPanelVisible ? '320px' : '0px'
+       } as React.CSSProperties}
+    >
       {/* Chat Sidebar */}
       <ChatSidebar 
         isChatPanelOpen={isChatPanelOpen} 
@@ -37,16 +41,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       
       {/* Main Content */}
       <main 
-        className={`transition-all duration-300 ${
-          isChatPanelOpen ? 'ml-96' : 'ml-16'
-        } ${
-          sourcesPanelVisible ? 'mr-80' : 'mr-0'
-        }`}
+        className="transition-all duration-300 ease-in-out"
         style={{ 
           minHeight: '100vh',
+          marginLeft: 'var(--sidebar-width)',
+          marginRight: 'var(--sources-width)'
         }}
       >
-        <div className="h-full">
+        <div className="h-full relative">
           {/* Clone children and pass onSourcesUpdate prop if it's the ChatInterface */}
           {React.cloneElement(children as React.ReactElement, { 
             onSourcesUpdate: handleSourcesUpdate 

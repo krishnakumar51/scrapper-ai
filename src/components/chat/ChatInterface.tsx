@@ -71,18 +71,27 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
   const [isTyping, setIsTyping] = useState(false);
   const [currentSources, setCurrentSources] = useState<ScrapedSource[]>([]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const { getCurrentSession, addMessage } = useChatStorage();
   const currentSession = getCurrentSession();
 
   useEffect(() => {
-    // Smooth scroll to bottom when new messages are added (proper chat behavior)
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({
-        top: scrollAreaRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
+    // Auto-scroll to bottom when new messages are added (ChatGPT-style behavior)
+    const scrollToBottom = () => {
+      if (scrollAreaRef.current) {
+        const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollElement) {
+          // Use setTimeout to ensure DOM has updated
+          setTimeout(() => {
+            scrollElement.scrollTop = scrollElement.scrollHeight;
+          }, 100);
+        }
+      }
+    };
+    
+    if (messages.length > 0) {
+      scrollToBottom();
     }
   }, [messages]);
 
@@ -105,51 +114,7 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
     }
   };
 
-  const handleSendMessage = async (message: string) => {
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(), // Generates a unique ID
-        content: message,
-        role: 'user',
-      }
-    ]);
-
-
-    setIsTyping(true);
-
-    // Get mock response and sources
-    const { response, sources } = getMockResponse(message);
-
-    // If there are sources, simulate the scraping process
-    if (sources.length > 0) {
-      await simulateScrapingProcess(sources);
-    }
-
-    // Simulate AI thinking time
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        content: response,
-        role: 'assistant',
-        sources: sources.length > 0 ? sources : undefined,
-      }
-    ]);
-
-    setIsTyping(false);
-
-    // Clear sources after some time if no more messages
-    if (sources.length > 0) {
-      setTimeout(() => {
-        setCurrentSources([]);
-        onSourcesUpdate?.([]);
-      }, 30000); // Clear after 30 seconds
-    }
-  };
 
   const handleSendPrompt = async (message: string) => {
 
@@ -189,64 +154,42 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {messages.length === 0 ? (
         // ChatGPT-style centered layout when empty
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-24">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-24 pt-16">
           <div className="text-center max-w-2xl mx-auto animate-fade-in">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-scraper-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-scraper-glow hover:shadow-scraper-lg transition-all duration-300 hover:scale-105">
-              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-              </svg>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl font-bold text-scraper-text-primary mb-4 bg-gradient-to-r from-scraper-text-primary to-scraper-accent-primary bg-clip-text text-transparent">
-              Welcome to WebScraper AI
+            <h1 className="text-4xl sm:text-5xl font-semibold text-scraper-text-primary mb-4 bg-gradient-to-r from-scraper-text-primary to-scraper-accent-primary bg-clip-text text-transparent">
+              WebScraper AI
             </h1>
 
-            <p className="text-scraper-text-secondary text-lg sm:text-xl mb-8 leading-relaxed">
-              Your intelligent web data extraction assistant. I can scrape websites, compare prices, extract content, and analyze data from multiple sources in real-time.
+            <p className="text-scraper-text-secondary text-base sm:text-lg mb-8 leading-relaxed font-medium">
+              Intelligent web data extraction & analysis
             </p>
-
-            <div className="grid sm:grid-cols-2 gap-4 max-w-xl mx-auto text-left mb-8">
-              <div className="bg-scraper-bg-card border border-scraper-border rounded-xl p-4 transition-all duration-300 hover:border-scraper-accent-primary/30 hover:shadow-scraper-md hover:scale-[1.02] animate-fade-in cursor-pointer" style={{ animationDelay: '100ms' }} onClick={() => handleSendPrompt('Compare MacBook prices across Amazon, Flipkart, and other e-commerce sites')}>
-                <h3 className="text-scraper-text-primary font-semibold mb-2 text-sm">Price Monitoring</h3>
-                <p className="text-scraper-text-muted text-xs leading-relaxed">
-                  Compare MacBook prices across Amazon, Flipkart, and other e-commerce sites
-                </p>
-              </div>
-
-              <div className="bg-scraper-bg-card border border-scraper-border rounded-xl p-4 transition-all duration-300 hover:border-scraper-accent-primary/30 hover:shadow-scraper-md hover:scale-[1.02] animate-fade-in cursor-pointer" style={{ animationDelay: '200ms' }} onClick={() => handleSendPrompt('Extract all product reviews from a specific category or brand')}>
-                <h3 className="text-scraper-text-primary font-semibold mb-2 text-sm">Data Extraction</h3>
-                <p className="text-scraper-text-muted text-xs leading-relaxed">
-                  Extract all product reviews from a specific category or brand
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Centered Input */}
-          <div className="w-full max-w-3xl mx-auto">
+          <div className="w-full max-w-3xl mx-auto mt-8">
             <FloatingInput onSendMessage={handleSendPrompt} disabled={isTyping} centered={true} />
           </div>
         </div>
       ) : (
         // Regular chat layout with messages
         <>
-          <ScrollArea className="flex-1 px-2 sm:px-3 scroll-smooth" ref={scrollAreaRef}>
-            <div className="max-w-3xl mx-auto py-2 sm:py-4 pb-20 sm:pb-24">
-              <div className="space-y-0.5">
-                {isTyping && (
-                  <div className="animate-fade-in">
-                    <TypingIndicator />
-                  </div>
-                )}
-                
+          <ScrollArea className="flex-1 px-4 sm:px-6" ref={scrollAreaRef}>
+            <div className="max-w-4xl mx-auto pt-8 pb-32">
+              <div className="space-y-6">
                 {messages.map((message, index) => (
                   <div key={message.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
                     <MessageBubble message={message} />
                   </div>
                 ))}
+                
+                {isTyping && (
+                  <div className="animate-fade-in">
+                    <TypingIndicator />
+                  </div>
+                )}
               </div>
             </div>
           </ScrollArea>
