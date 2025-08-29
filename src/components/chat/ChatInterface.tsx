@@ -5,66 +5,45 @@ import { Message, ScrapedSource } from '@/types/chat';
 import MessageBubble from './MessageBubble';
 import FloatingInput from './FloatingInput';
 import TypingIndicator from './TypingIndicator';
+import { askGemini } from '@/lib/geminiClient';
 
 interface ChatInterfaceProps {
   onSourcesUpdate?: (sources: ScrapedSource[]) => void;
 }
 
-// Mock AI responses and sources for demonstration
-const getMockResponse = (userMessage: string): { response: string; sources: ScrapedSource[] } => {
+// AI-powered response generation using Gemini
+const getAIResponse = async (userMessage: string): Promise<{ response: string; sources: ScrapedSource[] }> => {
   const mockSources: ScrapedSource[] = [];
-  let response = '';
-
-  // Check if message is about scraping or data extraction
-  if (userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('scrape') ||
-    userMessage.toLowerCase().includes('amazon') || userMessage.toLowerCase().includes('flipkart')) {
-
-    // Generate mock sources
-    mockSources.push(
-      {
-        id: `source_${Date.now()}_1`,
-        url: 'https://www.amazon.com/products/search',
-        title: 'Amazon Product Search Results',
-        favicon: 'https://www.amazon.com/favicon.ico',
-        status: 'success',
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: `source_${Date.now()}_2`,
-        url: 'https://www.flipkart.com/search',
-        title: 'Flipkart Product Listings',
-        favicon: 'https://www.flipkart.com/favicon.ico',
-        status: 'success',
-        timestamp: new Date().toISOString(),
-      }
-    );
-
-    response = `I've successfully scraped pricing information from multiple e-commerce platforms. Based on the data collected from Amazon and Flipkart, here's what I found:
-
-**Product Pricing Analysis:**
-
-• **Amazon**: Current listings show competitive pricing with frequent discounts
-• **Flipkart**: Similar price range with additional cashback offers
-• **Price Comparison**: Fluctuations detected across platforms
-
-The scraping process accessed ${mockSources.length} sources to gather comprehensive pricing data. All sources were successfully processed and the information has been analyzed for accuracy.
-
-Would you like me to monitor these prices for changes or scrape additional e-commerce platforms?`;
-  } else {
-    response = `I understand you're asking about "${userMessage}". 
-
-As WebScraper AI, I can help you extract and analyze data from websites. I specialize in:
-
-• **Price Monitoring**: Track product prices across e-commerce platforms
-• **Data Extraction**: Gather structured information from websites  
-• **Content Scraping**: Extract articles, reviews, and social media content
-• **Market Analysis**: Compare data across multiple sources
-• **Real-time Updates**: Monitor websites for changes
-
-Try asking me to scrape specific data like "Get the price of MacBook from Amazon and Flipkart" to see the source panel in action!`;
+  
+  try {
+    // Get AI response from Gemini
+    const response = await askGemini(userMessage);
+    
+    // Generate relevant mock sources based on the query
+    if (userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('scrape') ||
+        userMessage.toLowerCase().includes('amazon') || userMessage.toLowerCase().includes('flipkart') ||
+        userMessage.toLowerCase().includes('website') || userMessage.toLowerCase().includes('data')) {
+      
+      mockSources.push(
+        {
+          id: `source_${Date.now()}_1`,
+          url: 'https://example-target-site.com',
+          title: 'Target Website - Data Source',
+          favicon: 'https://example-target-site.com/favicon.ico',
+          status: 'success',
+          timestamp: new Date().toISOString(),
+        }
+      );
+    }
+    
+    return { response, sources: mockSources };
+  } catch (error) {
+    console.error('AI Response Error:', error);
+    return {
+      response: 'I apologize, but I\'m having trouble connecting to my AI service right now. Please check your API configuration and try again.',
+      sources: []
+    };
   }
-
-  return { response, sources: mockSources };
 };
 
 const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
@@ -72,28 +51,17 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
   const [currentSources, setCurrentSources] = useState<ScrapedSource[]>([]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const { getCurrentSession, addMessage } = useChatStorage();
   const currentSession = getCurrentSession();
 
   useEffect(() => {
-    // Auto-scroll to bottom when new messages are added (ChatGPT-style behavior)
-    const scrollToBottom = () => {
-      if (scrollAreaRef.current) {
-        const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (scrollElement) {
-          // Use setTimeout to ensure DOM has updated
-          setTimeout(() => {
-            scrollElement.scrollTop = scrollElement.scrollHeight;
-          }, 100);
-        }
-      }
-    };
-    
-    if (messages.length > 0) {
-      scrollToBottom();
+    if (bottomRef.current) {
+      // Smooth scroll to the latest message / typing indicator
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const simulateScrapingProcess = async (sources: ScrapedSource[]) => {
     // Start with loading sources
@@ -129,8 +97,8 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
 
     setIsTyping(true);
 
-    // Get mock response and sources
-    const { response, sources } = getMockResponse(message);
+    // Get AI response and sources
+    const { response, sources } = await getAIResponse(message);
 
     // If there are sources, simulate the scraping process
     if (sources.length > 0) {
@@ -157,13 +125,13 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
     <div className="flex flex-col h-full relative">
       {messages.length === 0 ? (
         // ChatGPT-style centered layout when empty
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-24 pt-16">
+        <div className="flex-1 flex flex-col items-center justify-start px-4 pt-32">
           <div className="text-center max-w-2xl mx-auto animate-fade-in">
-            <h1 className="text-4xl sm:text-5xl font-semibold text-scraper-text-primary mb-4 bg-gradient-to-r from-scraper-text-primary to-scraper-accent-primary bg-clip-text text-transparent">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-scraper-text-primary mb-6 bg-gradient-to-r from-scraper-text-primary to-scraper-accent-primary bg-clip-text text-transparent">
               WebScraper AI
             </h1>
 
-            <p className="text-scraper-text-secondary text-base sm:text-lg mb-8 leading-relaxed font-medium">
+            <p className="text-scraper-text-secondary text-lg sm:text-xl mb-10 leading-relaxed font-medium">
               Intelligent web data extraction & analysis
             </p>
           </div>
@@ -190,6 +158,8 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
                     <TypingIndicator />
                   </div>
                 )}
+                {/* Sentinel for auto-scroll */}
+                <div ref={bottomRef} />
               </div>
             </div>
           </ScrollArea>
