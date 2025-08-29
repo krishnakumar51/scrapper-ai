@@ -77,11 +77,14 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
   const currentSession = getCurrentSession();
 
   useEffect(() => {
-    // Scroll to bottom when new messages are added
+    // Smooth scroll to bottom when new messages are added (proper chat behavior)
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
-  }, [currentSession?.messages]);
+  }, [messages]);
 
   const simulateScrapingProcess = async (sources: ScrapedSource[]) => {
     // Start with loading sources
@@ -187,58 +190,71 @@ const ChatInterface = ({ onSourcesUpdate }: ChatInterfaceProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Messages Area */}
-      <ScrollArea className="flex-1 px-4" ref={scrollAreaRef}>
-        <div className="max-w-4xl mx-auto py-8">
-          {messages.length === 0 ? (
-            // Welcome Screen
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-scraper-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-scraper-glow">
-                <svg className="w-8 h-8 text-scraper-text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                </svg>
+      {messages.length === 0 ? (
+        // ChatGPT-style centered layout when empty
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-24">
+          <div className="text-center max-w-2xl mx-auto animate-fade-in">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-scraper-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-scraper-glow hover:shadow-scraper-lg transition-all duration-300 hover:scale-105">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+              </svg>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-bold text-scraper-text-primary mb-4 bg-gradient-to-r from-scraper-text-primary to-scraper-accent-primary bg-clip-text text-transparent">
+              Welcome to WebScraper AI
+            </h1>
+
+            <p className="text-scraper-text-secondary text-lg sm:text-xl mb-8 leading-relaxed">
+              Your intelligent web data extraction assistant. I can scrape websites, compare prices, extract content, and analyze data from multiple sources in real-time.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4 max-w-xl mx-auto text-left mb-8">
+              <div className="bg-scraper-bg-card border border-scraper-border rounded-xl p-4 transition-all duration-300 hover:border-scraper-accent-primary/30 hover:shadow-scraper-md hover:scale-[1.02] animate-fade-in cursor-pointer" style={{ animationDelay: '100ms' }} onClick={() => handleSendPrompt('Compare MacBook prices across Amazon, Flipkart, and other e-commerce sites')}>
+                <h3 className="text-scraper-text-primary font-semibold mb-2 text-sm">Price Monitoring</h3>
+                <p className="text-scraper-text-muted text-xs leading-relaxed">
+                  Compare MacBook prices across Amazon, Flipkart, and other e-commerce sites
+                </p>
               </div>
 
-              <h1 className="text-3xl font-bold text-scraper-text-primary mb-4">
-                Welcome to WebScraper AI
-              </h1>
-
-              <p className="text-scraper-text-secondary text-lg mb-8 max-w-2xl mx-auto">
-                Your intelligent web data extraction assistant. I can scrape websites,
-                compare prices, extract content, and analyze data from multiple sources in real-time.
-              </p>
-
-              <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto text-left">
-                <div className="bg-scraper-bg-card border border-scraper-border rounded-xl p-6">
-                  <h3 className="text-scraper-text-primary font-semibold mb-2">Price Monitoring</h3>
-                  <p className="text-scraper-text-muted text-sm">
-                    "Compare MacBook prices across Amazon, Flipkart, and other e-commerce sites"
-                  </p>
-                </div>
-
-                <div className="bg-scraper-bg-card border border-scraper-border rounded-xl p-6">
-                  <h3 className="text-scraper-text-primary font-semibold mb-2">Data Extraction</h3>
-                  <p className="text-scraper-text-muted text-sm">
-                    "Extract all product reviews from a specific category or brand"
-                  </p>
-                </div>
+              <div className="bg-scraper-bg-card border border-scraper-border rounded-xl p-4 transition-all duration-300 hover:border-scraper-accent-primary/30 hover:shadow-scraper-md hover:scale-[1.02] animate-fade-in cursor-pointer" style={{ animationDelay: '200ms' }} onClick={() => handleSendPrompt('Extract all product reviews from a specific category or brand')}>
+                <h3 className="text-scraper-text-primary font-semibold mb-2 text-sm">Data Extraction</h3>
+                <p className="text-scraper-text-muted text-xs leading-relaxed">
+                  Extract all product reviews from a specific category or brand
+                </p>
               </div>
             </div>
-          ) : (
-            // Chat Messages
-            <div className="space-y-1">
-              {messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
-              ))}
+          </div>
 
-              {isTyping && <TypingIndicator />}
-            </div>
-          )}
+          {/* Centered Input */}
+          <div className="w-full max-w-3xl mx-auto">
+            <FloatingInput onSendMessage={handleSendPrompt} disabled={isTyping} centered={true} />
+          </div>
         </div>
-      </ScrollArea>
+      ) : (
+        // Regular chat layout with messages
+        <>
+          <ScrollArea className="flex-1 px-2 sm:px-3 scroll-smooth" ref={scrollAreaRef}>
+            <div className="max-w-3xl mx-auto py-2 sm:py-4 pb-20 sm:pb-24">
+              <div className="space-y-0.5">
+                {isTyping && (
+                  <div className="animate-fade-in">
+                    <TypingIndicator />
+                  </div>
+                )}
+                
+                {messages.map((message, index) => (
+                  <div key={message.id} className="animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                    <MessageBubble message={message} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
 
-      {/* Input Area */}
-      <FloatingInput onSendMessage={handleSendPrompt} disabled={isTyping} />
+          {/* Fixed Input Area */}
+          <FloatingInput onSendMessage={handleSendPrompt} disabled={isTyping} />
+        </>
+      )}
     </div>
   );
 };

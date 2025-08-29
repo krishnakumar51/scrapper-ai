@@ -22,36 +22,35 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
   };
 
   return (
-    <div className={`flex gap-4 p-4 group ${
+    <div className={`flex gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-3 group transition-all duration-200 hover:bg-scraper-bg-card/20 ${
       isUser 
         ? 'bg-transparent justify-end' 
-        : 'bg-scraper-bg-card/30 justify-start'
+        : 'bg-scraper-bg-card/10 justify-start border-l-2 border-scraper-accent-primary/20'
     }`}>
       {isUser ? (
         // User message layout (right-aligned)
         <>
           {/* Content */}
-          <div className="max-w-2xl space-y-2">
+          <div className="max-w-xs sm:max-w-xl lg:max-w-2xl space-y-1 sm:space-y-2">
             <div className="flex items-center justify-end gap-2">
               {/* Action Buttons */}
-              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleCopyMessage}
-                  className="h-6 w-6 p-0 text-scraper-text-muted hover:text-scraper-text-primary hover:bg-scraper-bg-card"
+                  className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-scraper-text-muted hover:text-scraper-text-primary hover:bg-scraper-bg-card rounded-lg transition-all duration-200"
                 >
-                  <Copy className="w-3 h-3" />
+                  <Copy className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                 </Button>
               </div>
-              
             </div>
 
             {/* Message Content */}
-            <div className="bg-scraper-gradient-primary rounded-2xl rounded-tr-md px-4 py-3 shadow-scraper-sm">
-              <div className="text-scraper-text-primary leading-relaxed">
+            <div className="bg-scraper-gradient-primary rounded-2xl rounded-tr-md px-3 sm:px-4 py-2 sm:py-3 shadow-lg border border-scraper-border/20">
+              <div className="text-scraper-text-primary leading-relaxed text-sm sm:text-[15px]">
                 {message.content.split('\n').map((line, index) => (
-                  <p key={index} className="mb-2 last:mb-0">
+                  <p key={index} className="mb-1 sm:mb-2 last:mb-0 font-medium">
                     {line}
                   </p>
                 ))}
@@ -60,46 +59,46 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
           </div>
 
           {/* Avatar */}
-          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-scraper-gradient-primary shadow-scraper-glow">
-            <User className="w-4 h-4 text-scraper-text-primary" />
+          <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-scraper-gradient-primary shadow-lg ring-2 ring-scraper-accent-primary/20">
+            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-scraper-text-primary" />
           </div>
         </>
       ) : (
         // Assistant message layout (left-aligned)
         <>
           {/* Avatar */}
-          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-scraper-bg-card border border-scraper-border">
-            <Bot className="w-4 h-4 text-scraper-accent-primary" />
+          <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-scraper-bg-card border-2 border-scraper-accent-primary/30 shadow-md">
+            <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-scraper-accent-primary" />
           </div>
 
           {/* Content */}
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-2 sm:space-y-3 max-w-4xl">
             <div className="flex items-center justify-between">
-              
+              <div className="text-xs text-scraper-text-muted font-medium">WebScraper AI</div>
               {/* Action Buttons */}
-              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleCopyMessage}
-                  className="h-6 w-6 p-0 text-scraper-text-muted hover:text-scraper-text-primary hover:bg-scraper-bg-card"
+                  className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-scraper-text-muted hover:text-scraper-text-primary hover:bg-scraper-bg-card rounded-lg transition-all duration-200"
                 >
-                  <Copy className="w-3 h-3" />
+                  <Copy className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 text-scraper-text-muted hover:text-scraper-text-primary hover:bg-scraper-bg-card"
+                  className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-scraper-text-muted hover:text-scraper-text-primary hover:bg-scraper-bg-card rounded-lg transition-all duration-200"
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                 </Button>
               </div>
             </div>
 
             {/* Message Content */}
-            <div className="text-scraper-text-primary leading-relaxed prose prose-invert max-w-none">
+            <div className="text-scraper-text-primary leading-relaxed text-sm sm:text-[15px] prose prose-invert max-w-none">
               {message.content.split('\n').map((line, index) => (
-                <p key={index} className="mb-2 last:mb-0">
+                <p key={index} className="mb-3 sm:mb-4 last:mb-0 font-normal">
                   {line}
                 </p>
               ))}

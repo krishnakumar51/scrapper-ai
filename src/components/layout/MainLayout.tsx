@@ -29,7 +29,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-scraper-bg-primary">
+    <div 
+      className="min-h-screen bg-scraper-bg-primary"
+      style={{
+        '--sidebar-width': sidebarCollapsed ? '64px' : '320px',
+        '--sources-width': sourcesPanelVisible ? '320px' : '0px'
+      } as React.CSSProperties}
+    >
       {/* Header */}
       <Header />
       
