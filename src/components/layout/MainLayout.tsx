@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import React from 'react';
-import Header from './Header';
 import ChatSidebar from '../chat/ChatSidebar';
 import SourcePanel from '../chat/SourcePanel';
 import { ScrapedSource } from '@/types/chat';
@@ -10,7 +9,7 @@ interface MainLayoutProps {
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
   const [sourcesPanelVisible, setSourcesPanelVisible] = useState(false);
   const [currentSources, setCurrentSources] = useState<ScrapedSource[]>([]);
 
@@ -19,9 +18,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     setSourcesPanelVisible(sources.length > 0);
   };
 
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
+
 
   const closeSourcesPanel = () => {
     setSourcesPanelVisible(false);
@@ -29,31 +26,24 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
 
   return (
-    <div 
-      className="min-h-screen bg-scraper-bg-primary"
-      style={{
-        '--sidebar-width': sidebarCollapsed ? '64px' : '320px',
-        '--sources-width': sourcesPanelVisible ? '320px' : '0px'
-      } as React.CSSProperties}
-    >
-      {/* Header */}
-      <Header />
+    <div className="min-h-screen bg-scraper-bg-primary">
+
       
       {/* Chat Sidebar */}
       <ChatSidebar 
-        isCollapsed={sidebarCollapsed} 
-        onToggle={toggleSidebar} 
+        isChatPanelOpen={isChatPanelOpen} 
+        onChatToggle={() => setIsChatPanelOpen(!isChatPanelOpen)} 
       />
       
       {/* Main Content */}
       <main 
-        className={`pt-14 transition-all duration-300 ${
-          sidebarCollapsed ? 'ml-16' : 'ml-80'
+        className={`transition-all duration-300 ${
+          isChatPanelOpen ? 'ml-96' : 'ml-16'
         } ${
           sourcesPanelVisible ? 'mr-80' : 'mr-0'
         }`}
         style={{ 
-          minHeight: 'calc(100vh - 3.5rem)',
+          minHeight: '100vh',
         }}
       >
         <div className="h-full">

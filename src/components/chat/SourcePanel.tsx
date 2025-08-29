@@ -63,7 +63,7 @@ const SourcePanel = ({ isVisible, sources, onClose }: SourcePanelProps) => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed right-0 top-14 bottom-0 w-80 bg-scraper-bg-secondary border-l border-scraper-border shadow-scraper-lg z-40">
+    <div className="fixed right-0 top-0 bottom-0 w-80 bg-scraper-bg-secondary border-l border-scraper-border shadow-scraper-lg z-40">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-scraper-border">
         <div className="flex items-center space-x-2">
