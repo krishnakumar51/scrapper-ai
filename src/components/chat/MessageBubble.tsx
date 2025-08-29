@@ -2,6 +2,8 @@ import { Bot, User, Copy, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Message } from '@/types/chat';
 import SourcesList from './SourcesList';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface MessageBubbleProps {
   message: Message;
@@ -95,13 +97,40 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
               </div>
             </div>
 
-            {/* Message Content */}
+            {/* Message Content (Markdown) */}
             <div className="text-scraper-text-primary leading-relaxed text-base sm:text-[16px] prose prose-invert max-w-none">
-              {message.content.split('\n').map((line, index) => (
-                <p key={index} className="mb-4 sm:mb-5 last:mb-0 font-normal">
-                  {line}
-                </p>
-              ))}
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a
+                      {...props}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-scraper-accent-primary underline hover:opacity-90"
+                    />
+                  ),
+                  code: (props) => {
+                    const { inline, className, children, ...rest } = props as any;
+                    if (inline) {
+                      return (
+                        <code className="rounded px-1.5 py-0.5 bg-scraper-bg-secondary" {...rest}>
+                          {children}
+                        </code>
+                      );
+                    }
+                    return (
+                      <pre className="overflow-x-auto">
+                        <code className="block rounded-md p-3 bg-scraper-bg-card border border-scraper-border" {...rest}>
+                          {children}
+                        </code>
+                      </pre>
+                    );
+                  },
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
             </div>
 
             {/* Sources */}
